@@ -1492,13 +1492,13 @@ func TestValidate(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name:    "incorrect field nested under map key",
+			name:    "invalid field of a message map value",
 			msg:     &testproto.Profile{},
 			paths:   []string{"attributes.src1.invalid"},
 			wantErr: true,
 		},
 		{
-			name:    "incorrect nested field under map key",
+			name:    "scalar map value under message map rejects deeper path",
 			msg:     &testproto.Profile{},
 			paths:   []string{"attributes.src1.tags.key1.invalid"},
 			wantErr: true,

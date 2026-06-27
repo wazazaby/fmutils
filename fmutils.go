@@ -187,6 +187,10 @@ func (mask NestedMask) Overwrite(src, dest proto.Message) {
 // Validate checks if all paths are valid for specified message.
 //
 // Supports scalars, messages, repeated fields, and maps.
+//
+// A path segment following a map field is treated as a map key, which is
+// always valid since keys are arbitrary. Any deeper segments are validated
+// against the map value message (only possible when the value is a message).
 func (m NestedMask) Validate(validationModel proto.Message) error {
 	err := m.validate("", validationModel.ProtoReflect())
 	if err != nil {
@@ -288,7 +292,7 @@ func (mask NestedMask) validate(pathPrefix string, msg protoreflect.Message) err
 
 				keyPath := fullPath(path, mapKey)
 				if !valueIsMessage {
-					return fmt.Errorf("%q: map value isn't message kind", keyPath)
+					return fmt.Errorf("%q: cannot select fields of a non-message map value", keyPath)
 				}
 
 				if err := keySubmask.validate(keyPath, msg.Get(fieldDesc).Map().NewValue().Message()); err != nil {
