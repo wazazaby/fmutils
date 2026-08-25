@@ -179,6 +179,8 @@ func (mask NestedMask) Prune(msg proto.Message) {
 // Supports scalars, messages, repeated fields, and maps.
 // If the parent of the field is nil message, the parent is initiated before overwriting the field
 // If the field in src is empty value, the field in dest is cleared.
+// A field overwritten as a whole is assigned, not copied, so dest and src end up
+// sharing that message, list or map; clone src first if it is mutated afterwards.
 // Paths are assumed to be valid and normalized otherwise the function may panic.
 func (mask NestedMask) Overwrite(src, dest proto.Message) {
 	mask.overwrite(src.ProtoReflect(), dest.ProtoReflect())
