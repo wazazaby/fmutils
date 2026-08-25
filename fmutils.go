@@ -212,11 +212,9 @@ func (mask NestedMask) overwrite(srcRft, destRft protoreflect.Message) {
 			}
 		} else if srcFD.IsMap() && srcFD.Kind() == protoreflect.MessageKind {
 			srcMap := srcRft.Get(srcFD).Map()
-			destMap := destRft.Get(srcFD).Map()
-			if !destMap.IsValid() {
-				destRft.Set(srcFD, protoreflect.ValueOf(srcMap))
-				destMap = destRft.Get(srcFD).Map()
-			}
+			// Mutable initializes an unset dest map in place. Setting src's map instead
+			// would alias it into dest, and panic when src's own map is unset.
+			destMap := destRft.Mutable(srcFD).Map()
 			srcMap.Range(func(mk protoreflect.MapKey, mv protoreflect.Value) bool {
 				if mi, ok := submask[mk.String()]; ok {
 					if i, ok := mv.Interface().(protoreflect.Message); ok && len(mi) > 0 {
